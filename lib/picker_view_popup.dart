@@ -1,32 +1,28 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'picker_view.dart';
 
-typedef PickerViewBuilder = Widget Function(BuildContext context, PickerViewPopup pickerViewPopup);
+typedef PickerViewBuilder = Widget Function(
+    BuildContext context, PickerViewPopup pickerViewPopup);
 
-enum PickerShowMode {
-  AlertDialog,
-  BottomSheet
-}
+enum PickerShowMode { AlertDialog, BottomSheet }
 
 class PickerViewPopup extends StatelessWidget {
-  
   final PickerRowCallBack numberofRowsAtSection;
   final PickerItemBuilder itemBuilder;
-  final PickerVoidCallBack onSelectRowChanged;
-  final ValueChanged<PickerController> onConfirm;
-  final VoidCallback onCancel;
+  final PickerVoidCallBack? onSelectRowChanged;
+  final ValueChanged<PickerController>? onConfirm;
+  final VoidCallback? onCancel;
   final PickerController controller;
-  final double itemExtent;
-  final Widget cancel;
-  final Widget confirm;
+  final double? itemExtent;
+  final Widget? cancel;
+  final Widget? confirm;
   final PickerShowMode mode;
-  final Widget title;
+  final Widget? title;
 
   PickerViewPopup._({
-    @required this.numberofRowsAtSection,
-    @required this.itemBuilder,
-    @required this.controller,
+    required this.numberofRowsAtSection,
+    required this.itemBuilder,
+    required this.controller,
     this.mode = PickerShowMode.BottomSheet,
     this.itemExtent,
     this.onSelectRowChanged,
@@ -36,20 +32,21 @@ class PickerViewPopup extends StatelessWidget {
     this.confirm,
     this.onConfirm,
   }) : super();
-  
-  static Future<T> showMode<T>(PickerShowMode mode,{
-    @required BuildContext context,
-    @required PickerViewBuilder builder,
-    @required PickerController controller,
-    @required PickerRowCallBack numberofRowsAtSection,
-    @required PickerItemBuilder itemBuilder,
-    PickerVoidCallBack onSelectRowChanged,
-    double itemExtent,
-    Widget title,
-    Widget cancel,
-    VoidCallback onCancel,
-    Widget confirm,
-    ValueChanged<PickerController> onConfirm,
+
+  static Future showMode<T>(
+    PickerShowMode mode, {
+    required BuildContext context,
+    required PickerViewBuilder builder,
+    required PickerController controller,
+    required PickerRowCallBack numberofRowsAtSection,
+    required PickerItemBuilder itemBuilder,
+    PickerVoidCallBack? onSelectRowChanged,
+    double? itemExtent,
+    Widget? title,
+    Widget? cancel,
+    VoidCallback? onCancel,
+    Widget? confirm,
+    ValueChanged<PickerController>? onConfirm,
   }) {
     PickerViewPopup pickerView = PickerViewPopup._(
       numberofRowsAtSection: numberofRowsAtSection,
@@ -73,26 +70,24 @@ class PickerViewPopup extends StatelessWidget {
 
     if (mode == PickerShowMode.AlertDialog) {
       return showDialog(
-        context: context,
-        builder: (context) {
-          return Dialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: builder(context, pickerView)
-          );
-        });
+          context: context,
+          builder: (context) {
+            return Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: builder(context, pickerView));
+          });
     } else {
       return showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return builder(context, pickerView);
-        }
-      );
+          context: context,
+          builder: (context) {
+            return builder(context, pickerView);
+          });
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
-
     if (mode == PickerShowMode.AlertDialog) {
       return _buildDialogContent(context);
     } else {
@@ -104,62 +99,68 @@ class PickerViewPopup extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        color: Colors.white,
-        constraints: BoxConstraints.tightFor(height: 280),
-        child: Column(
-          children: <Widget>[
-            Offstage(
-              offstage: title == null,
-              child: Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(horizontal: 15,vertical: 20),
-                child: title,
+          color: Colors.white,
+          constraints: BoxConstraints.tightFor(height: 280),
+          child: Column(
+            children: <Widget>[
+              Offstage(
+                offstage: title == null,
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+                  child: title,
+                ),
               ),
-            ),
-            Expanded(
-              child: PickerView(
-                numberofRowsAtSection: numberofRowsAtSection,
-                itemBuilder: itemBuilder,
-                controller: controller,
-                onSelectRowChanged: onSelectRowChanged,
-                itemExtent: itemExtent,
+              Expanded(
+                child: PickerView(
+                  numberofRowsAtSection: numberofRowsAtSection,
+                  itemBuilder: itemBuilder,
+                  controller: controller,
+                  onSelectRowChanged: onSelectRowChanged,
+                  itemExtent: itemExtent,
+                ),
               ),
-            ),
-            Container(
-              height: 50,
-              decoration: BoxDecoration(
-                border: Border(top: BorderSide(color: Theme.of(context).dividerColor))
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Expanded(
-                    child: _buildInkWellButton(
-                      child: cancel ?? Text('取消',style: TextStyle(color: Colors.grey)),
-                      onTap: onCancel
+              Container(
+                height: 50,
+                decoration: BoxDecoration(
+                    border: Border(
+                        top:
+                            BorderSide(color: Theme.of(context).dividerColor))),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: _buildInkWellButton(
+                          child: cancel ??
+                              Text('取消', style: TextStyle(color: Colors.grey)),
+                          onTap: () {
+                            if (onCancel != null) {
+                              onCancel!();
+                            }
+                          }),
                     ),
-                  ),
-                  Container(
-                    color: Theme.of(context).dividerColor,
-                    width: 1,
-                    height: 50,
-                  ),
-                  Expanded(
-                    child: _buildInkWellButton(
-                      child: confirm ?? Text('确定',style: TextStyle(color: Theme.of(context).accentColor)),
-                      onTap: () {
-                        if(onConfirm != null) {
-                          onConfirm(controller);
-                        }
-                      }
+                    Container(
+                      color: Theme.of(context).dividerColor,
+                      width: 1,
+                      height: 50,
                     ),
-                  )
-                ],
-              ),
-            )
-          ],
-        )
-      ),
+                    Expanded(
+                      child: _buildInkWellButton(
+                          child: confirm ??
+                              Text('确定',
+                                  style: TextStyle(
+                                      color: Theme.of(context).accentColor)),
+                          onTap: () {
+                            if (onConfirm != null) {
+                              onConfirm!(controller);
+                            }
+                          }),
+                    )
+                  ],
+                ),
+              )
+            ],
+          )),
     );
   }
 
@@ -175,9 +176,13 @@ class PickerViewPopup extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 _buildInkWellButton(
-                  child: cancel ?? Text('取消',style: TextStyle(color: Colors.grey)),
-                  onTap: onCancel
-                ),
+                    child: cancel ??
+                        Text('取消', style: TextStyle(color: Colors.grey)),
+                    onTap: () {
+                      if (onCancel != null) {
+                        onCancel!();
+                      }
+                    }),
                 Expanded(
                   child: Offstage(
                     offstage: title == null,
@@ -189,13 +194,15 @@ class PickerViewPopup extends StatelessWidget {
                   ),
                 ),
                 _buildInkWellButton(
-                  child: confirm ?? Text('确定',style: TextStyle(color: Theme.of(context).accentColor)),
-                  onTap: () {
-                    if(onConfirm != null) {
-                      onConfirm(controller);
-                    }
-                  }
-                ),
+                    child: confirm ??
+                        Text('确定',
+                            style: TextStyle(
+                                color: Theme.of(context).accentColor)),
+                    onTap: () {
+                      if (onConfirm != null) {
+                        onConfirm!(controller);
+                      }
+                    }),
               ],
             ),
           ),
@@ -204,32 +211,33 @@ class PickerViewPopup extends StatelessWidget {
               numberofRowsAtSection: numberofRowsAtSection,
               itemBuilder: itemBuilder,
               controller: controller,
-              onSelectRowChanged: onSelectRowChanged,
-              itemExtent: itemExtent,
+              onSelectRowChanged: (section, row) {
+                if (onSelectRowChanged != null) {
+                  onSelectRowChanged!(section, row);
+                }
+              },
+              itemExtent: itemExtent ?? null,
             ),
           )
         ],
       ),
     );
   }
-  
-  Widget _buildInkWellButton({
-    Widget child,
-    VoidCallback onTap
-  }) {
+
+  Widget _buildInkWellButton(
+      {required Widget child, required VoidCallback onTap}) {
     return Material(
-      child: Ink(
-        color: Colors.white,
-        child: InkWell(
-          child: Container(
-            height: 50,
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            alignment: Alignment.center,
-            child: child,
-          ),
-          onTap: onTap,
+        child: Ink(
+      color: Colors.white,
+      child: InkWell(
+        child: Container(
+          height: 50,
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          alignment: Alignment.center,
+          child: child,
         ),
-      )
-    );
+        onTap: () => onTap(),
+      ),
+    ));
   }
 }
